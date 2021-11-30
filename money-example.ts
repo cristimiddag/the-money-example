@@ -1,9 +1,9 @@
 interface Expression {
   reduce(bank: Bank, to: string): Money;
 
-  plus(addend: Expression);
+  plus(addend: Expression): Expression;
 
-  times(multiplier: number);
+  times(multiplier: number): Expression;
 }
 
 export class Money implements Expression {
@@ -45,7 +45,7 @@ export class Money implements Expression {
   }
 
   public reduce = (bank: Bank, to: string): Money => {
-    let rate = bank.rate(this.currency, to);
+    const rate = bank.rate(this.currency, to);
     return new Money(this.amount / rate, to);
   }
 }
@@ -55,14 +55,14 @@ export class Dollar extends Money{
   constructor(amount: number, currency: string) {
     super(amount, currency);
     }
-};
+}
 
 export class Franc extends Money {
 
   constructor(amount: number, currency: string) {
     super(amount, currency);
     }
-};
+}
 
 export class Bank {
   public amount: number;
@@ -71,7 +71,7 @@ export class Bank {
     if (from === to) {
       return 1;
     }
-    let rate = this.rates.get(Pair.key(from, to));
+    const rate = this.rates.get(Pair.key(from, to));
     return rate;
   }
 
@@ -84,7 +84,7 @@ export class Bank {
   addRate = (from: string, to: string, rate: number): void => {
     this.rates.set(Pair.key(from, to), rate);
   };
-};
+}
 
 export class Sum implements Expression {
 
@@ -97,18 +97,18 @@ export class Sum implements Expression {
   }
 
   public reduce = (bank: Bank, to: string): Money => {
-    let amount = this.augend.reduce(bank, to).amount + this.addend.reduce(bank, to).amount;
+    const amount = this.augend.reduce(bank, to).amount + this.addend.reduce(bank, to).amount;
     return new Money(amount, to);
   }
 
-  public plus = (addend: Expression) => {
+  public plus = (addend: Expression): Expression => {
     return new Sum(this, addend);
   }
 
   public times = (multiplier: number): Expression => {
     return new Sum(this.augend.times(multiplier), this.addend.times(multiplier))
   }
-};
+}
 
 export class Pair {
   private from: string;
@@ -122,7 +122,7 @@ export class Pair {
   static key = (from: string, to: string) => new Pair(from, to).toString();
 
   public equals = (object: Object): boolean => {
-    let pair = object as Pair;
+    const pair = object as Pair;
     return (this.from === pair.from) && (this.to === pair.to);
   }
 
